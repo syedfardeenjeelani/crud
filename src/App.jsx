@@ -6,7 +6,7 @@ import "./App.css";
 function App() {
   const [todo, setTodo] = useState([]);
   const [input, setInput] = useState("");
-  const [editedInputVal, setEditedInputVal] = useState("");
+  // const [editedInputVal, setEditedInputVal] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [todoTitle, setTodoTitle] = useState();
 
@@ -27,20 +27,18 @@ function App() {
     //console.log(latestValue, "latestValue");
     setTodo((prev) => {
       return prev.map((el) => {
-        return uniqueId !== el.id && { ...el, isEditing: !el.isEditing };
+        return uniqueId === el.id ? { ...el, isEditing: !el.isEditing } : el
       });
-    });
-    setIsEditing(true);
+    }); 
   };
   const handleSave = (uniqueId,latestValue) => {
     setTodo((prev) => {
       return prev.map((el) => {
         return (
-          uniqueId === el.id ? { ...el, title: latestValue, isEditing: false } : {...el}
+          uniqueId == el.id ?  { ...el, title: latestValue, isEditing: false } : el
         );
       });
-    });
-    setIsEditing(false);
+    }); 
   };
   return (
     <>
@@ -59,7 +57,7 @@ function App() {
           return (
             <>
               <div id={todo.id}>
-                {isEditing && !todo.isEditing ? (
+                {todo.isEditing ? (
                   <input
                     type="text"
                     value={todoTitle}
@@ -69,7 +67,7 @@ function App() {
                   <span>{todo.title}</span>
                 )}
                 <button onClick={() => handleDelete(todo.id)}>Delete</button>
-                {isEditing && !todo.isEditing ? (
+                { todo.isEditing ? (
                   <button onClick={() => handleSave(todo.id,todoTitle)}>
                     Save
                   </button>
