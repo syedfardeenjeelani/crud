@@ -1,35 +1,95 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [todo, setTodo] = useState([]);
+  const [input, setInput] = useState("");
+  const [editedInputVal, setEditedInputVal] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [todoTitle, setTodoTitle] = useState();
 
+  const handleAdd = (inputValue) => {
+    setTodo((prev) => {
+      return [
+        ...prev,
+        { title: inputValue, id: crypto.randomUUID(), isEditing: false },
+      ];
+    });
+  };
+  const handleDelete = (id) => {
+    const filteredValue = todo.filter((el) => el.id !== id);
+    setTodo(filteredValue);
+  };
+  const handleEdit = (uniqueId) => {
+    // console.log(uniqueId,'unique')
+    //console.log(latestValue, "latestValue");
+    setTodo((prev) => {
+      return prev.map((el) => {
+        return uniqueId !== el.id && { ...el, isEditing: !el.isEditing };
+      });
+    });
+    setIsEditing(true);
+  };
+  const handleSave = (uniqueId,latestValue) => {
+    setTodo((prev) => {
+      return prev.map((el) => {
+        return (
+          uniqueId === el.id ? { ...el, title: latestValue, isEditing: false } : {...el}
+        );
+      });
+    });
+    setIsEditing(false);
+  };
   return (
     <>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <input onChange={(e) => setInput(e.target.value)} type="text" />
+        <button onClick={() => handleAdd(input)}>Add</button>
+      </div>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {todo.map((todo) => {
+          return (
+            <>
+              <div id={todo.id}>
+                {isEditing && !todo.isEditing ? (
+                  <input
+                    type="text"
+                    value={todoTitle}
+                    onChange={(e) => setTodoTitle(e.target.value)}
+                  />
+                ) : (
+                  <span>{todo.title}</span>
+                )}
+                <button onClick={() => handleDelete(todo.id)}>Delete</button>
+                {isEditing && !todo.isEditing ? (
+                  <button onClick={() => handleSave(todo.id,todoTitle)}>
+                    Save
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setTodoTitle(todo.title);
+                      handleEdit(todo.id);
+                    }}
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+            </>
+          );
+        })}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
